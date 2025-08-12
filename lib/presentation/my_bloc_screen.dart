@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bloc_example/bloc/bloc.dart';
 import 'package:flutter_bloc_example/bloc/event.dart';
-import 'package:flutter_bloc_example/bloc/selector.dart';
+import 'package:flutter_bloc_example/bloc/state.dart';
 import 'package:flutter_bloc_example/model/calendar_type.dart';
 
 class MyBlocScreen extends StatefulWidget {
@@ -69,9 +69,29 @@ class _FirstCounterValueWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final firstCounter = MyBlocSelector.counterOneSelector(context);
-    debugPrint('Call log First Counter update $firstCounter');
-    return Text('First Counter Is $firstCounter');
+    final bloc = context.read<MyBloc>();
+    debugPrint('Call log First Counter Value Widget build');
+    return BlocBuilder<MyBloc, MyState>(
+      buildWhen: (MyState prev, MyState current) {
+        if (prev is! FirstCounterUpdatedState && current is! FirstCounterUpdatedState) {
+          return false;
+        }
+        if (prev is! FirstCounterUpdatedState && current is FirstCounterUpdatedState) {
+          return true;
+        }
+        if (prev is FirstCounterUpdatedState && current is! FirstCounterUpdatedState) {
+          return false;
+        }
+        final prevValue = (prev as FirstCounterUpdatedState).count;
+        final currentValue = (current as FirstCounterUpdatedState).count;
+        return prevValue != currentValue;
+      },
+      builder: (BuildContext context, MyState state) {
+        debugPrint('Call log FirstCounter Builder Widget value update ${bloc.counterOne}');
+        return Text('First Counter Is ${bloc.counterOne}');
+        // FirstCounterUpdatedState
+      },
+    );
   }
 }
 
@@ -97,9 +117,29 @@ class _SecondCounterValueWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final secondCounter = MyBlocSelector.counterTwoSelector(context);
-    debugPrint('Call log Second Counter update $secondCounter');
-    return Text('Second Counter Is $secondCounter');
+    final bloc = context.read<MyBloc>();
+    debugPrint('Call log Second Counter Value Widget build');
+    return BlocBuilder<MyBloc, MyState>(
+      buildWhen: (MyState prev, MyState current) {
+        if (prev is! SecondCounterUpdatedState && current is! SecondCounterUpdatedState) {
+          return false;
+        }
+        if (prev is! SecondCounterUpdatedState && current is SecondCounterUpdatedState) {
+          return true;
+        }
+        if (prev is SecondCounterUpdatedState && current is! SecondCounterUpdatedState) {
+          return false;
+        }
+        final prevValue = (prev as SecondCounterUpdatedState).count;
+        final currentValue = (current as SecondCounterUpdatedState).count;
+        return prevValue != currentValue;
+      },
+      builder: (BuildContext context, MyState state) {
+        debugPrint('Call log SecondCounter Builder Widget value update ${bloc.counterOne}');
+        return Text('Second Counter Is ${bloc.counterOne}');
+        // FirstCounterUpdatedState
+      },
+    );
   }
 }
 
@@ -127,7 +167,7 @@ class _TextFieldWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     debugPrint('Call log Text Field Build');
     return TextField(
-      onChanged: (value) => _onChanged(context,value),
+      onChanged: (value) => _onChanged(context, value),
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -144,9 +184,9 @@ class _TextFieldWidget extends StatelessWidget {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
-          disabledBorder :OutlineInputBorder(
-      borderRadius: BorderRadius.all(Radius.circular(10)),
-    ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
       ),
     );
   }
@@ -161,9 +201,28 @@ class _TextFieldValueWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = MyBlocSelector.textSelector(context);
-    debugPrint('Call log Text Field value update $text');
-    return Text('Text Value Is $text');
+    final bloc = context.read<MyBloc>();
+    debugPrint('Call log Text Field Value Widget build');
+    return BlocBuilder<MyBloc, MyState>(
+      buildWhen: (MyState prev, MyState current) {
+        if (prev is! TextFieldValueChangedState && current is! TextFieldValueChangedState) {
+          return false;
+        }
+        if (prev is! TextFieldValueChangedState && current is TextFieldValueChangedState) {
+          return true;
+        }
+        if (prev is TextFieldValueChangedState && current is! TextFieldValueChangedState) {
+          return false;
+        }
+        final prevValue = (prev as TextFieldValueChangedState).text;
+        final currentValue = (current as TextFieldValueChangedState).text;
+        return prevValue != currentValue;
+      },
+      builder: (BuildContext context, MyState state) {
+        debugPrint('Call log TextField Builder Widget value update ${bloc.text}');
+        return Text('Text Value Is ${bloc.text}');
+      },
+    );
   }
 }
 
@@ -172,40 +231,59 @@ class _CalendarTypeSelectorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final calendarType = MyBlocSelector.calendarTypeSelector(context);
-    debugPrint('Call log Calendar Type value update $calendarType');
-    return SegmentedButton<CalendarType>(
-      style: SegmentedButton.styleFrom(
-        backgroundColor: Colors.grey[200],
-        foregroundColor: Colors.red,
-        selectedForegroundColor: Colors.white,
-        selectedBackgroundColor: Colors.green,
-      ),
-      segments: const <ButtonSegment<CalendarType>>[
-        ButtonSegment<CalendarType>(
-          value: CalendarType.day,
-          label: Text('Day'),
-          icon: Icon(Icons.calendar_view_day),
-        ),
-        ButtonSegment<CalendarType>(
-          value: CalendarType.week,
-          label: Text('Week'),
-          icon: Icon(Icons.calendar_view_week),
-        ),
-        ButtonSegment<CalendarType>(
-          value: CalendarType.month,
-          label: Text('Month'),
-          icon: Icon(Icons.calendar_view_month),
-        ),
-        ButtonSegment<CalendarType>(
-          value: CalendarType.year,
-          label: Text('Year'),
-          icon: Icon(Icons.calendar_today),
-        ),
-      ],
-      selected: <CalendarType>{calendarType},
-      onSelectionChanged: (Set<CalendarType> newSelection) {
-        context.read<MyBloc>().add(UpdateCalendarTypeEvent(calendarType: newSelection.first));
+    final bloc = context.read<MyBloc>();
+    debugPrint('Call log Calendar Type Value Widget build');
+    return BlocBuilder<MyBloc, MyState>(
+      buildWhen: (MyState prev, MyState current) {
+        if (prev is! CalendarTypeUpdateState && current is! CalendarTypeUpdateState) {
+          return false;
+        }
+        if (prev is! CalendarTypeUpdateState && current is CalendarTypeUpdateState) {
+          return true;
+        }
+        if (prev is CalendarTypeUpdateState && current is! CalendarTypeUpdateState) {
+          return false;
+        }
+        final prevValue = (prev as CalendarTypeUpdateState).calendarType;
+        final currentValue = (current as CalendarTypeUpdateState).calendarType;
+        return prevValue != currentValue;
+      },
+      builder: (context, state) {
+        debugPrint('Call log CalendarType Selector Builder Widget value update ${bloc.calendarType}');
+        return SegmentedButton<CalendarType>(
+          style: SegmentedButton.styleFrom(
+            backgroundColor: Colors.grey[200],
+            foregroundColor: Colors.red,
+            selectedForegroundColor: Colors.white,
+            selectedBackgroundColor: Colors.green,
+          ),
+          segments: const <ButtonSegment<CalendarType>>[
+            ButtonSegment<CalendarType>(
+              value: CalendarType.day,
+              label: Text('Day'),
+              icon: Icon(Icons.calendar_view_day),
+            ),
+            ButtonSegment<CalendarType>(
+              value: CalendarType.week,
+              label: Text('Week'),
+              icon: Icon(Icons.calendar_view_week),
+            ),
+            ButtonSegment<CalendarType>(
+              value: CalendarType.month,
+              label: Text('Month'),
+              icon: Icon(Icons.calendar_view_month),
+            ),
+            ButtonSegment<CalendarType>(
+              value: CalendarType.year,
+              label: Text('Year'),
+              icon: Icon(Icons.calendar_today),
+            ),
+          ],
+          selected: <CalendarType>{bloc.calendarType},
+          onSelectionChanged: (Set<CalendarType> newSelection) {
+            context.read<MyBloc>().add(UpdateCalendarTypeEvent(calendarType: newSelection.first));
+          },
+        );
       },
     );
   }
@@ -216,14 +294,35 @@ class _CheckboxWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isChecked = MyBlocSelector.checkedSelector(context);
-    debugPrint('Call log Checkbox value update $isChecked');
-    return Checkbox(
-      value: isChecked,
-      onChanged: (bool? value) {
-        if(value != null) {
-          context.read<MyBloc>().add(UpdateCheckboxValueEvent(isChecked: value));
+    final bloc = context.read<MyBloc>();
+    debugPrint('Call log Calendar Type Value Widget build');
+    return BlocBuilder<MyBloc, MyState>(
+      buildWhen: (MyState prev, MyState current) {
+        if (prev is! CheckboxValueUpdatedState && current is! CheckboxValueUpdatedState) {
+          return false;
         }
+        if (prev is! CheckboxValueUpdatedState && current is CheckboxValueUpdatedState) {
+          return true;
+        }
+        if (prev is CheckboxValueUpdatedState && current is! CheckboxValueUpdatedState) {
+          return false;
+        }
+        final prevValue = (prev as CheckboxValueUpdatedState).isChecked;
+        final currentValue = (current as CheckboxValueUpdatedState).isChecked;
+        return prevValue != currentValue;
+      },
+      builder: (context, state) {
+        debugPrint('Call log Checkbox Builder Widget value update ${bloc.isChecked}');
+        return Checkbox(
+          value: bloc.isChecked,
+          onChanged: (bool? value) {
+            if (value != null) {
+              context.read<MyBloc>().add(
+                UpdateCheckboxValueEvent(isChecked: value),
+              );
+            }
+          },
+        );
       },
     );
   }
@@ -234,13 +333,32 @@ class _SliderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sliderValue = MyBlocSelector.sliderSelector(context);
-    debugPrint('Call log SliderWidget value update $sliderValue');
-    return Slider(
-      value: sliderValue,
-      max: 100,
-      onChanged: (double value) {
-        context.read<MyBloc>().add(UpdateSliderValueEvent(value: value));
+    final bloc = context.read<MyBloc>();
+    debugPrint('Call log Slider Value Widget build');
+    return BlocBuilder<MyBloc, MyState>(
+      buildWhen: (MyState prev, MyState current) {
+        if (prev is! SliderValueUpdatedState && current is! SliderValueUpdatedState) {
+          return false;
+        }
+        if (prev is! SliderValueUpdatedState && current is SliderValueUpdatedState) {
+          return true;
+        }
+        if (prev is SliderValueUpdatedState && current is! SliderValueUpdatedState) {
+          return false;
+        }
+        final prevValue = (prev as SliderValueUpdatedState).value;
+        final currentValue = (current as SliderValueUpdatedState).value;
+        return prevValue != currentValue;
+      },
+      builder: (context, state) {
+        debugPrint('Call log Slider Builder Widget value update ${bloc.sliderValue}');
+        return Slider(
+          value: bloc.sliderValue,
+          max: 100,
+          onChanged: (double value) {
+            context.read<MyBloc>().add(UpdateSliderValueEvent(value: value));
+          },
+        );
       },
     );
   }
@@ -251,8 +369,27 @@ class _SliderValueWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sliderValue = MyBlocSelector.sliderSelector(context).toString();
-    debugPrint('Call log SliderValue Widget value update $sliderValue');
-    return Text('Slider Value Is $sliderValue');
+    final bloc = context.read<MyBloc>();
+    debugPrint('Call log Slider Value Widget build');
+    return BlocBuilder<MyBloc, MyState>(
+      builder: (context, state) {
+        debugPrint('Call log SliderValue Widget Builder value update ${bloc.sliderValue}');
+        return Text('Slider Value Is ${bloc.sliderValue}');
+      },
+      buildWhen: (prev, current) {
+        if (prev is! SliderValueUpdatedState && current is! SliderValueUpdatedState) {
+          return false;
+        }
+        if (prev is! SliderValueUpdatedState && current is SliderValueUpdatedState) {
+          return true;
+        }
+        if (prev is SliderValueUpdatedState && current is! SliderValueUpdatedState) {
+          return false;
+        }
+        final prevValue = (prev as SliderValueUpdatedState).value;
+        final currentValue = (current as SliderValueUpdatedState).value;
+        return prevValue != currentValue;
+      },
+    );
   }
 }
