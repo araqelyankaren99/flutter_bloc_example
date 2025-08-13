@@ -14,7 +14,7 @@ class MyStateInitial extends MyState {
 class FirstCounterUpdatedState extends MyState {
   const FirstCounterUpdatedState({required this.count});
 
-  final int count;
+  final String count;
 
   @override
   List<Object?> get props => [count];
@@ -23,7 +23,7 @@ class FirstCounterUpdatedState extends MyState {
 class SecondCounterUpdatedState extends MyState {
   const SecondCounterUpdatedState({required this.count});
 
-  final int count;
+  final String count;
 
   @override
   List<Object?> get props => [count];

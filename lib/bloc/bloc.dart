@@ -36,7 +36,7 @@ class MyBloc extends Bloc<MyEvent,MyState> {
       Emitter<MyState> emit,
       ) async{
     _counterOne = _counterOne +1;
-    emit(FirstCounterUpdatedState(count: _counterOne));
+    emit(FirstCounterUpdatedState(count: _counterOne.toString()));
   }
 
   Future<void> _onIncrementSecondCounterEventToState(
@@ -44,7 +44,7 @@ class MyBloc extends Bloc<MyEvent,MyState> {
       Emitter<MyState> emit,
       ) async{
     _counterTwo = _counterTwo +1;
-    emit(SecondCounterUpdatedState(count: _counterTwo));
+    emit(SecondCounterUpdatedState(count: _counterTwo.toString()));
   }
 
   Future<void> _onTextFieldValueChangedEventToState(
