@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bloc_example/bloc/bloc.dart';
 import 'package:flutter_bloc_example/bloc/event.dart';
-import 'package:flutter_bloc_example/bloc/selector.dart';
+import 'package:flutter_bloc_example/bloc/state.dart';
 import 'package:flutter_bloc_example/model/calendar_type.dart';
 
 class MyBlocScreen extends StatefulWidget {
@@ -64,14 +66,41 @@ class _MyBlocScreenState extends State<MyBlocScreen> {
   }
 }
 
-class _FirstCounterValueWidget extends StatelessWidget {
+class _FirstCounterValueWidget extends StatefulWidget {
   const _FirstCounterValueWidget();
 
   @override
+  State<_FirstCounterValueWidget> createState() => _FirstCounterValueWidgetState();
+}
+
+class _FirstCounterValueWidgetState extends State<_FirstCounterValueWidget> {
+  late String _counterOne;
+  StreamSubscription<MyState>? _streamSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    final bloc = context.read<MyBloc>();
+    _counterOne = bloc.counterOne;
+    _streamSubscription = bloc.stream.listen((state) {
+      if (state is FirstCounterUpdatedState) {
+        setState(() {
+          _counterOne = bloc.counterOne;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _streamSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final firstCounter = MyBlocSelector.counterOneSelector(context);
-    debugPrint('Call log First Counter update $firstCounter');
-    return Text('First Counter Is $firstCounter');
+    debugPrint('Call log First Counter update $_counterOne');
+    return Text('First Counter Is $_counterOne');
   }
 }
 
@@ -92,14 +121,41 @@ class _FirstCounterIncrementButtonWidget extends StatelessWidget {
   }
 }
 
-class _SecondCounterValueWidget extends StatelessWidget {
+class _SecondCounterValueWidget extends StatefulWidget {
   const _SecondCounterValueWidget();
 
   @override
+  State<_SecondCounterValueWidget> createState() => _SecondCounterValueWidgetState();
+}
+
+class _SecondCounterValueWidgetState extends State<_SecondCounterValueWidget> {
+  late String _counterTwo;
+  StreamSubscription<MyState>? _streamSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    final bloc = context.read<MyBloc>();
+    _counterTwo = bloc.counterTwo;
+    _streamSubscription = bloc.stream.listen((state) {
+      if (state is SecondCounterUpdatedState) {
+        setState(() {
+          _counterTwo = bloc.counterTwo;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _streamSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final secondCounter = MyBlocSelector.counterTwoSelector(context);
-    debugPrint('Call log Second Counter update $secondCounter');
-    return Text('Second Counter Is $secondCounter');
+    debugPrint('Call log Second Counter update $_counterTwo');
+    return Text('Second Counter Is $_counterTwo');
   }
 }
 
@@ -156,24 +212,78 @@ class _TextFieldWidget extends StatelessWidget {
   }
 }
 
-class _TextFieldValueWidget extends StatelessWidget {
+class _TextFieldValueWidget extends StatefulWidget {
   const _TextFieldValueWidget();
 
   @override
-  Widget build(BuildContext context) {
-    final text = MyBlocSelector.textSelector(context);
-    debugPrint('Call log Text Field value update $text');
-    return Text('Text Value Is $text');
-  }
+  State<_TextFieldValueWidget> createState() => _TextFieldValueWidgetState();
 }
 
-class _CalendarTypeSelectorWidget extends StatelessWidget {
-  const _CalendarTypeSelectorWidget();
+class _TextFieldValueWidgetState extends State<_TextFieldValueWidget> {
+  late String _text;
+  StreamSubscription<MyState>? _streamSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    final bloc = context.read<MyBloc>();
+    _text = bloc.text;
+    _streamSubscription = bloc.stream.listen((state) {
+      if (state is TextFieldValueChangedState) {
+        setState(() {
+          _text = bloc.text;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _streamSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final calendarType = MyBlocSelector.calendarTypeSelector(context);
-    debugPrint('Call log Calendar Type value update $calendarType');
+    debugPrint('Call log Text Field value update $_text');
+    return Text('Text Value Is $_text');
+  }
+}
+
+class _CalendarTypeSelectorWidget extends StatefulWidget {
+  const _CalendarTypeSelectorWidget();
+
+  @override
+  State<_CalendarTypeSelectorWidget> createState() => _CalendarTypeSelectorWidgetState();
+}
+
+class _CalendarTypeSelectorWidgetState extends State<_CalendarTypeSelectorWidget> {
+  late CalendarType _calendarType;
+  StreamSubscription<MyState>? _streamSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    final bloc = context.read<MyBloc>();
+    _calendarType = bloc.calendarType;
+    _streamSubscription = bloc.stream.listen((state) {
+      if (state is CalendarTypeUpdateState) {
+        setState(() {
+          _calendarType = bloc.calendarType;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _streamSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    debugPrint('Call log Calendar Type value update $_calendarType');
     return SegmentedButton<CalendarType>(
       style: SegmentedButton.styleFrom(
         backgroundColor: Colors.grey[200],
@@ -203,7 +313,7 @@ class _CalendarTypeSelectorWidget extends StatelessWidget {
           icon: Icon(Icons.calendar_today),
         ),
       ],
-      selected: <CalendarType>{calendarType},
+      selected: <CalendarType>{_calendarType},
       onSelectionChanged: (Set<CalendarType> newSelection) {
         context.read<MyBloc>().add(UpdateCalendarTypeEvent(calendarType: newSelection.first));
       },
@@ -211,15 +321,42 @@ class _CalendarTypeSelectorWidget extends StatelessWidget {
   }
 }
 
-class _CheckboxWidget extends StatelessWidget {
+class _CheckboxWidget extends StatefulWidget {
   const _CheckboxWidget();
 
   @override
+  State<_CheckboxWidget> createState() => _CheckboxWidgetState();
+}
+
+class _CheckboxWidgetState extends State<_CheckboxWidget> {
+  late bool _isChecked;
+  StreamSubscription<MyState>? _streamSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    final bloc = context.read<MyBloc>();
+    _isChecked = bloc.isChecked;
+    _streamSubscription = bloc.stream.listen((state) {
+      if (state is CheckboxValueUpdatedState) {
+        setState(() {
+          _isChecked = bloc.isChecked;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _streamSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final isChecked = MyBlocSelector.checkedSelector(context);
-    debugPrint('Call log Checkbox value update $isChecked');
+    debugPrint('Call log Checkbox value update $_isChecked');
     return Checkbox(
-      value: isChecked,
+      value: _isChecked,
       onChanged: (bool? value) {
         if(value != null) {
           context.read<MyBloc>().add(UpdateCheckboxValueEvent(isChecked: value));
@@ -229,16 +366,44 @@ class _CheckboxWidget extends StatelessWidget {
   }
 }
 
-class _SliderWidget extends StatelessWidget {
+class _SliderWidget extends StatefulWidget {
   const _SliderWidget();
 
   @override
+  State<_SliderWidget> createState() => _SliderWidgetState();
+}
+
+class _SliderWidgetState extends State<_SliderWidget> {
+  late double _sliderValue;
+  StreamSubscription<MyState>? _streamSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    final bloc = context.read<MyBloc>();
+    _sliderValue = bloc.sliderValue;
+    _streamSubscription = bloc.stream.listen((state) {
+      if (state is SliderValueUpdatedState) {
+        setState(() {
+          _sliderValue = bloc.sliderValue;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _streamSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final sliderValue = MyBlocSelector.sliderSelector(context);
-    debugPrint('Call log SliderWidget value update $sliderValue');
+    debugPrint('Call log SliderWidget value update $_sliderValue');
     return Slider(
-      value: sliderValue,
+      value: _sliderValue,
       max: 100,
+
       onChanged: (double value) {
         context.read<MyBloc>().add(UpdateSliderValueEvent(value: value));
       },
@@ -246,13 +411,40 @@ class _SliderWidget extends StatelessWidget {
   }
 }
 
-class _SliderValueWidget extends StatelessWidget {
+class _SliderValueWidget extends StatefulWidget {
   const _SliderValueWidget();
 
   @override
+  State<_SliderValueWidget> createState() => _SliderValueWidgetState();
+}
+
+class _SliderValueWidgetState extends State<_SliderValueWidget> {
+  late double _sliderValue;
+  StreamSubscription<MyState>? _streamSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    final bloc = context.read<MyBloc>();
+    _sliderValue = bloc.sliderValue;
+    _streamSubscription = bloc.stream.listen((state) {
+      if (state is SliderValueUpdatedState) {
+        setState(() {
+          _sliderValue = bloc.sliderValue;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _streamSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final sliderValue = MyBlocSelector.sliderSelector(context).toString();
-    debugPrint('Call log SliderValue Widget value update $sliderValue');
-    return Text('Slider Value Is $sliderValue');
+    debugPrint('Call log SliderValue Widget value update $_sliderValue');
+    return Text('Slider Value Is $_sliderValue');
   }
 }
