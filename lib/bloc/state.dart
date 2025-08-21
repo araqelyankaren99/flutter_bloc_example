@@ -1,66 +1,49 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc_example/model/calendar_type.dart';
 
-abstract class MyState extends Equatable {
-  const MyState();
-  @override
-  List<Object?> get props => [];
-}
+class MyState extends Equatable {
+  const MyState({
+    required this.firstCount,
+    required this.secondCount,
+    required this.text,
+    required this.calendarType,
+    required this.isChecked,
+    required this.sliderValue,
+  });
 
-class MyStateInitial extends MyState {
-  const MyStateInitial();
-}
-
-class FirstCounterUpdatedState extends MyState {
-  const FirstCounterUpdatedState({required this.count});
-
-  final int count;
-
-  @override
-  List<Object?> get props => [count];
-}
-
-class SecondCounterUpdatedState extends MyState {
-  const SecondCounterUpdatedState({required this.count});
-
-  final int count;
-
-  @override
-  List<Object?> get props => [count];
-}
-
-class TextFieldValueChangedState extends MyState {
-  const TextFieldValueChangedState({required this.text});
-
+  final int firstCount;
+  final int secondCount;
   final String text;
-
-  @override
-  List<Object?> get props => [text];
-}
-
-class CalendarTypeUpdateState extends MyState {
-  const CalendarTypeUpdateState({required this.calendarType});
-
   final CalendarType calendarType;
-
-  @override
-  List<Object?> get props => [calendarType];
-}
-
-class CheckboxValueUpdatedState extends MyState {
-  const CheckboxValueUpdatedState({required this.isChecked});
-
   final bool isChecked;
+  final double sliderValue;
+
+
+  MyState copyWith({
+    int? firstCount,
+    int? secondCount,
+    String? text,
+    CalendarType? calendarType,
+    bool? isChecked,
+    double? sliderValue,
+  }) {
+    return MyState(
+        firstCount: firstCount ?? this.firstCount,
+        secondCount: secondCount ?? this.secondCount,
+        text: text ?? this.text,
+        calendarType: calendarType ?? this.calendarType,
+        isChecked: isChecked ?? this.isChecked,
+        sliderValue: sliderValue ?? this.sliderValue,
+    );
+  }
 
   @override
-  List<Object?> get props => [isChecked];
-}
-
-class SliderValueUpdatedState extends MyState {
-  const SliderValueUpdatedState({required this.value});
-
-  final double value;
-
-  @override
-  List<Object?> get props => [value];
+  List<Object?> get props => [
+    firstCount,
+    secondCount,
+    text,
+    calendarType,
+    isChecked,
+    sliderValue,
+  ];
 }
